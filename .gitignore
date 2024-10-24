@@ -1,0 +1,87 @@
+# General
+*.log
+*.pot
+*.pyc
+*.pyo
+*.pyd
+*.swp
+*.swo
+*.idea/
+*.vscode/
+.env
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Django-specific
+db.sqlite3
+/db.sqlite3-journal
+media/
+staticfiles/
+*.sqlite3
+
+# Django environment
+/venv/
+.venv/
+env/
+env.bak/
+.env
+*.env
+
+# Migrations
+*/migrations/*
+!*/migrations/__init__.py
+
+# Redis
+dump.rdb
+redis.conf
+
+# Frontend (Node.js / React)
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+/frontend/build/
+frontend/.env
+frontend/.DS_Store
+
+# macOS
+.DS_Store
+
+# Coverage reports
+htmlcov/
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# Testing
+.pytest_cache/
+__tests__/
+__snapshots__/
+junit-*.xml
+
+# Docker
+docker-compose.override.yml
+.dockerignore
+
+# Editor files
+*.sublime-project
+*.sublime-workspace
+*.code-workspace
+
+# Logs
+*.log
+logs/
+*.out
+*.err
+
+# Temporary files
+*.bak
+*.orig
+*.tmp
+*.old

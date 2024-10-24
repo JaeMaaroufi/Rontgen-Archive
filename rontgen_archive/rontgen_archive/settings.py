@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from pathlib import Path
 import os
-
+from celery.schedules import crontab
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -29,6 +29,14 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+CELERY_BROKER_URL = 'redis://localhost:6379/0'
+
+CELERY_BEAT_SCHEDULE = {
+    'cleanup-temp-files-every-hour': {
+        'task': 'rontgen_archive.tasks.cleanup_temp_files',
+        'schedule': crontab(minute=0, hour='*'),  # Every hour
+    },
+}
 
 # Add TCIA API Settings
 TCIA_API_BASE_URL = 'https://services.cancerimagingarchive.net/services/v4'

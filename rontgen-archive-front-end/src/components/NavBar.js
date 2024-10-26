@@ -1,4 +1,4 @@
-// import React, { useState } from "react";
+import React, { useState } from "react";
 // import { Link } from "react-router-dom";
 
 import rontgenArchiveLogo from "../assets/Rontgen_Archive_logo_text-removebg-preview.png";
@@ -6,6 +6,11 @@ import rontgenArchiveImageLogo from "../assets/logo.png";
 import searchIcon from "../assets/searchIcon.png";
 
 const NavBar = ({ toggleSidebar }) => {
+  const [searchValue, setSearchValue] = useState("");
+
+  const handleSearchValue = (event) => {
+    setSearchValue(event.target.value);
+  };
   return (
     <div className="flex justify-between bg-[#e7f5ee] h-20 shadow-[0px_-20px_30px_00px_#1a202c] px-2 md:px-5 sticky top-0 2xl:justify-around z-50">
       <div className="flex lg:gap-4 2xl:gap-10">
@@ -47,6 +52,8 @@ const NavBar = ({ toggleSidebar }) => {
             placeholder="Search..."
             name="text"
             type="text"
+            onChange={handleSearchValue}
+            value={searchValue}
           />
           <button
             type="button"

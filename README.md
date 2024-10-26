@@ -1,3 +1,3 @@
 Back end developed by Sagun
 
-Front end developed by JaeMaaroufi
+Front end developed by Jafar E. Al-Fatlawi

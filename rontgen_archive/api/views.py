@@ -5,6 +5,7 @@ import os
 import zipfile
 import matplotlib as plt
 from PIL import Image
+import random
 import io
 
 from rest_framework.decorators import api_view
@@ -127,28 +128,40 @@ def fetch_and_convert_dicom(request):
 
 def search_images(request):
     body_part = request.GET.get('bodyPart')
-    modality = request.GET.get('modality')
     cached_images_path = os.path.join(settings.BASE_DIR, 'rontgen_archive', 'api', 'cached_images')
 
-    # Filtered list for images and metadata based on body part and modality
+    # Ensure a body part was specified
+    if not body_part:
+        return JsonResponse({'error': 'Missing required parameter: bodyPart'}, status=400)
+
+    # Fetch metadata from the TCIA API for the given body part
+    metadata_response = requests.get(f'https://services.cancerimagingarchive.net/services/v4/TCIA/query/getSeries?BodyPartExamined={body_part}')
+    
+    if metadata_response.status_code != 200:
+        return JsonResponse({'error': 'Failed to fetch metadata from TCIA API'}, status=metadata_response.status_code)
+
+    # Parse the metadata response
+    metadata_list = metadata_response.json()  # Assuming the response is a JSON array
+
+    # Filter for images that have the desired body part
+    filtered_metadata = [meta for meta in metadata_list if body_part.lower() in meta['BodyPartExamined'].lower()]
+
+    # Randomly select a few images from the filtered metadata
+    num_images_to_return = min(5, len(filtered_metadata))  # Return up to 5 images, or less if not enough
+    selected_metadata = random.sample(filtered_metadata, num_images_to_return) if filtered_metadata else []
+
     images_metadata = []
 
-    # Assuming metadata is stored in a JSON file for demonstration, otherwise, fetch metadata dynamically
-    metadata_path = os.path.join(settings.BASE_DIR, 'rontgen_archive', 'api', 'metadata.json')
-    with open(metadata_path, 'r') as f:
-        metadata = json.load(f)
-    
-    for meta in metadata:
-        if body_part.lower() in meta['BodyPartExamined'].lower() and modality.lower() in meta['Modality'].lower():
-            # Construct file path for the cached image
-            image_filename = f"{meta['SeriesInstanceUID']}.png"
-            image_path = os.path.join(cached_images_path, image_filename)
+    # Construct the response for the selected images
+    for meta in selected_metadata:
+        image_filename = f"{meta['SeriesInstanceUID']}.png"  # Assuming image naming convention
+        image_path = os.path.join(cached_images_path, image_filename)
 
-            if os.path.exists(image_path):  # Check if image is cached
-                images_metadata.append({
-                    'image_url': f"/api/cached_images/{image_filename}",  # URL for frontend to access the image
-                    'metadata': meta
-                })
+        if os.path.exists(image_path):  # Check if image is cached
+            images_metadata.append({
+                'image_url': f"/api/cached_images/{image_filename}",  # URL for frontend to access the image
+                'metadata': meta
+            })
 
     return JsonResponse({'images': images_metadata}, status=200)
 

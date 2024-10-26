@@ -13,14 +13,16 @@ const NavBar = ({ toggleSidebar }) => {
   };
 
   const onSearch = async () => {
+    console.log("Searching for:", searchValue);  // Check what you're searching for
     if (!searchValue.trim()) return;
-
+  
     try {
       const response = await fetch(
         `http://localhost:8000/api/search-images?bodyPart=${searchValue}&modality=CT`
       );
       const data = await response.json();
-
+  
+      console.log("API response:", data);  // Log the API response
       if (response.ok) {
         setSearchResults(data.images);
       } else {

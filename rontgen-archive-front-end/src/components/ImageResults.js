@@ -1,24 +1,39 @@
-import React from "react";
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 
-const ImageResults = ({ results }) => {
-  if (!results || results.length === 0) {
-    return <p className="text-center mt-4">No results found.</p>;
-  }
+const ImageResults = ({ searchParams }) => {
+  const [images, setImages] = useState([]);
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    const fetchImages = async () => {
+      try {
+        const response = await axios.get(`/api/search_images`, { params: searchParams });
+        if (response.data.images) {
+          setImages(response.data.images);
+        } else {
+          setError('No images found');
+        }
+      } catch (err) {
+        setError('Error fetching images: ' + err.message);
+      }
+    };
+
+    fetchImages();
+  }, [searchParams]);
+
+  if (error) return <div>{error}</div>;
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-      {results.map((result, index) => (
-        <div key={index} className="border p-4 rounded shadow">
-          <img
-            src={`http://localhost:8000${result.image_url}`}
-            alt="Scan"
-            className="w-full h-auto"
-          />
-          <div className="mt-2">
-            <p><strong>Patient ID:</strong> {result.metadata.PatientID}</p>
-            <p><strong>Modality:</strong> {result.metadata.Modality}</p>
-            <p><strong>Body Part Examined:</strong> {result.metadata.BodyPartExamined}</p>
-            <p><strong>Series Date:</strong> {result.metadata.SeriesDate}</p>
+    <div>
+      {images.map((img) => (
+        <div key={img.metadata.SeriesInstanceUID}>
+          <img src={img.image_url} alt="Medical scan" />
+          <div>
+            <p>Patient ID: {img.metadata.PatientID}</p>
+            <p>Body Part Examined: {img.metadata.BodyPartExamined}</p>
+            <p>Modality: {img.metadata.Modality}</p>
+            {/* Add more metadata as needed */}
           </div>
         </div>
       ))}

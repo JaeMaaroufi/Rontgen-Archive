@@ -41,6 +41,10 @@ CELERY_BEAT_SCHEDULE = {
 # Add TCIA API Settings
 TCIA_API_BASE_URL = 'https://services.cancerimagingarchive.net/services/v4'
 
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # React front-end URL
+]
+
 
 # Application definition
 
@@ -52,6 +56,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'api',
+    'corsheaders',
 ]
 
 MIDDLEWARE = [
@@ -62,6 +67,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
 ]
 
 CACHES = {

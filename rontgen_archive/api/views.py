@@ -125,6 +125,33 @@ def fetch_and_convert_dicom(request):
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
 
+def search_images(request):
+    body_part = request.GET.get('bodyPart')
+    modality = request.GET.get('modality')
+    cached_images_path = os.path.join(settings.BASE_DIR, 'rontgen_archive', 'api', 'cached_images')
+
+    # Filtered list for images and metadata based on body part and modality
+    images_metadata = []
+
+    # Assuming metadata is stored in a JSON file for demonstration, otherwise, fetch metadata dynamically
+    metadata_path = os.path.join(settings.BASE_DIR, 'rontgen_archive', 'api', 'metadata.json')
+    with open(metadata_path, 'r') as f:
+        metadata = json.load(f)
+    
+    for meta in metadata:
+        if body_part.lower() in meta['BodyPartExamined'].lower() and modality.lower() in meta['Modality'].lower():
+            # Construct file path for the cached image
+            image_filename = f"{meta['SeriesInstanceUID']}.png"
+            image_path = os.path.join(cached_images_path, image_filename)
+
+            if os.path.exists(image_path):  # Check if image is cached
+                images_metadata.append({
+                    'image_url': f"/api/cached_images/{image_filename}",  # URL for frontend to access the image
+                    'metadata': meta
+                })
+
+    return JsonResponse({'images': images_metadata}, status=200)
+
 def convert_dicom_to_png(dicom_path):
     """Converts a DICOM file to PNG format and caches it."""
     ds = pydicom.dcmread(dicom_path)  # Read DICOM file
